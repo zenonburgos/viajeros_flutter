@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "902935868392",
+    "project_id": "drivers-f86a3",
+    "storage_bucket": "drivers-f86a3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:902935868392:android:b2ecfc338c51b831c26a5d",
+        "android_client_info": {
+          "package_name": "com.asyste.viajeros"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "902935868392-srr4jcf65puqjjni756aokvurvfvsdlm.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.asyste.viajeros",
+            "certificate_hash": "d386aaa5c3fdb6190719a5a89b82e91b16407a02"
+          }
+        },
+        {
+          "client_id": "902935868392-91hn2luo0g7viivvifdu1f4m1cpdrmuk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDg-o1awaXnlUMZxT-BcEU2W_fnqGS1dRs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "902935868392-91hn2luo0g7viivvifdu1f4m1cpdrmuk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
