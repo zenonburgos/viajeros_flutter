@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:viajeros/src/models/client.dart';
 import 'package:viajeros/src/providers/auth_provider.dart';
+import 'package:viajeros/src/providers/client_provider.dart';
 
 class RegisterController {
 
@@ -11,10 +13,12 @@ class RegisterController {
   TextEditingController confirmPasswordController = TextEditingController();
 
   AuthProvider? _authProvider;
+  ClientProvider? _clientProvider;
 
   Future? init (BuildContext context) {
     this.context = context;
     _authProvider = AuthProvider();
+    _clientProvider = ClientProvider();
   }
 
   void register() async {
@@ -47,6 +51,15 @@ class RegisterController {
       bool isRegister = (await _authProvider?.register(email, password)) ?? false;
 
       if (isRegister) {
+
+        Client client = Client(
+            id: _authProvider?.getUser()?.uid ?? "",
+            email: _authProvider?.getUser()?.email ?? "",
+            username: username,
+            password: password
+        );
+
+        await _clientProvider?.create(client);
         print('¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡El usuario se registró correctamente!!!!!!!!!!!!!!!');
       }
       else {

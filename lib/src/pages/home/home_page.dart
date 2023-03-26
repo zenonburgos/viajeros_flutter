@@ -30,7 +30,7 @@ class HomePage extends StatelessWidget {
               const SizedBox(height: 10),
               _textTypeUser('Cliente'),
               const SizedBox(height: 30),
-              _imageTypeUser(context, 'assets/img/pasajero.png'),
+              _imageTypeUser(context, 'assets/img/driver.png'),
               const SizedBox(height: 10),
               _textTypeUser('Conductor'),
               const SizedBox(height: 30),
