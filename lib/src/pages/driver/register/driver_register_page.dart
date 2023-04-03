@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_custom_clippers/flutter_custom_clippers.dart';
-import 'package:viajeros/src/pages/login/login_controller.dart';
+import 'package:viajeros/src/pages/driver/register/driver_register_controller.dart';
 import 'package:viajeros/src/utils/colors.dart' as utils;
+import 'package:viajeros/src/utils/otp_widget.dart';
 import 'package:viajeros/src/widgets/button_app.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({Key? key}) : super(key: key);
+class DriverRegisterPage extends StatefulWidget {
+  const DriverRegisterPage({Key? key}) : super(key: key);
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<DriverRegisterPage> createState() => _DriverRegisterPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _DriverRegisterPageState extends State<DriverRegisterPage> {
 
-  final LoginController _con = LoginController();
+  final DriverRegisterController _con = DriverRegisterController();
 
   @override
   void initState() {
@@ -36,41 +37,39 @@ class _LoginPageState extends State<LoginPage> {
           children: [
             _bannerApp(),
             _textLogin(),
-            SizedBox(height: MediaQuery.of(context).size.height * 0.17),
+            _textLicencePlate(),
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 25),
+                child: OTPFields(
+                  pin1: _con.pin1Controller,
+                  pin2: _con.pin2Controller,
+                  pin3: _con.pin3Controller,
+                  pin4: _con.pin4Controller,
+                  pin5: _con.pin5Controller,
+                  pin6: _con.pin6Controller,
+                  pin7: _con.pin7Controller, key: null,
+                )
+            ),
+            _textFieldUsername(),
             _textFieldEmail(),
             _textFieldPassword(),
-            _buttonLogin(),
-            _textDontHaveAccount()
+            _textFieldConfirmPassword(),
+            _buttonRegister()
           ],
         ),
       ),
     );
   }
 
-  Widget _textDontHaveAccount() {
-    return GestureDetector(
-      //onTap: _con.goToRegisterPage,
-      child: GestureDetector(
-        onTap: _con.goToRegisterPage,
-        child: Container(
-          margin: EdgeInsets.only(bottom: 50),
-          child: const Text(
-            '¿No tienes una cuenta?',
-            style: TextStyle(fontSize: 15, color: utils.Colors.uberCloneColor),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buttonLogin() {
+  Widget _buttonRegister() {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 30, vertical: 25),
       child: ButtonApp(
-          onPressed: _con.login,
+          onPressed: _con.register,
           color: utils.Colors.uberCloneColor,
-          text: 'Iniciar Sesión',
-          textColor: utils.Colors.accentColor,
+          text: 'Registrar',
+          //textColor: Colors.white,
+          textColor: utils.Colors.surfaceColor,
       ),
     );
   }
@@ -85,6 +84,22 @@ class _LoginPageState extends State<LoginPage> {
             labelText: 'Correo Electrónico',
             suffixIcon: Icon(
               Icons.email_outlined,
+              color: utils.Colors.uberCloneColor,
+            )),
+      ),
+    );
+  }
+
+  Widget _textFieldUsername() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+      child: TextField(
+        controller: _con.usernameController,
+        decoration: const InputDecoration(
+            hintText: 'Tu Nombre',
+            labelText: 'Nombre de usuario',
+            suffixIcon: Icon(
+              Icons.person_outline,
               color: utils.Colors.uberCloneColor,
             )),
       ),
@@ -108,14 +123,49 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  Widget _textFieldConfirmPassword() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+      child: TextField(
+        controller: _con.confirmPasswordController,
+        obscureText: true,
+        //controller: _con.passwordController,
+        decoration: const InputDecoration(
+            labelText: 'Confirmar Contraseña',
+            suffixIcon: Icon(
+              Icons.lock_open_outlined,
+              color: utils.Colors.uberCloneColor,
+            )),
+      ),
+    );
+  }
+
+  Widget _textLicencePlate() {
+    return Container(
+      alignment: Alignment.centerLeft,
+      margin: EdgeInsets.symmetric(horizontal: 30),
+      child: const Text(
+        'Placa del vehículo',
+        style: TextStyle(
+          color: Colors.black54,
+          fontSize: 17
+        ),
+      ),
+    );
+  }
+
   Widget _textLogin() {
     return Container(
       alignment: Alignment.centerLeft,
-      margin: const EdgeInsets.symmetric(horizontal: 30),
+      margin: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
       child: const Text(
-        'Accede',
+        'REGISTRO',
         style: TextStyle(
-            color: utils.Colors.uberCloneColorDark, fontWeight: FontWeight.bold, fontSize: 28),
+            //color: Colors.black,
+            color: utils.Colors.uberCloneColorDark,
+            fontWeight: FontWeight.bold,
+            fontSize: 25
+        ),
       ),
     );
   }

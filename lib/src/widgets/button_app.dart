@@ -48,7 +48,8 @@ class ButtonApp extends StatelessWidget {
               height: 50,
               child: CircleAvatar(
                 radius: 15,
-                backgroundColor: Colors.white,
+                //backgroundColor: Colors.white,
+                backgroundColor: utils.Colors.accentColor,
                 child: Icon(icon, color: utils.Colors.uberCloneColor),
               ),
             ),

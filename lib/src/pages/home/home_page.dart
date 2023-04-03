@@ -1,14 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_custom_clippers/flutter_custom_clippers.dart';
 import 'package:viajeros/src/pages/home/home_controller.dart';
+import 'package:viajeros/src/utils/colors.dart' as utils;
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
 
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
   final HomeController _con = HomeController();
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+      _con.init(context);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    _con.init(context); //INICIALIZANDO CONTROLLER
 
     return Scaffold(
       body: SafeArea(
@@ -17,7 +33,8 @@ class HomePage extends StatelessWidget {
             gradient: LinearGradient(
               begin: Alignment.topRight,
               end: Alignment.bottomLeft,
-              colors: [Colors.black, Colors.black87]
+              //colors: [Colors.black, Colors.black87]
+              colors: [utils.Colors.uberCloneColorDark, utils.Colors.uberCloneColor]
             )
           ),
           child: Column(
@@ -26,11 +43,11 @@ class HomePage extends StatelessWidget {
               const SizedBox(height: 50),
               _textSelectYourRol(),
               const SizedBox(height: 30),
-             _imageTypeUser(context, 'assets/img/pasajero.png'),
+             _imageTypeUser(context, 'assets/img/pasajero.png', 'client'),
               const SizedBox(height: 10),
               _textTypeUser('Cliente'),
               const SizedBox(height: 30),
-              _imageTypeUser(context, 'assets/img/driver.png'),
+              _imageTypeUser(context, 'assets/img/driver.png', 'driver'),
               const SizedBox(height: 10),
               _textTypeUser('Conductor'),
               const SizedBox(height: 30),
@@ -58,9 +75,10 @@ class HomePage extends StatelessWidget {
             const Text(
               'Fácil y seguro',
               style: TextStyle(
+                  color: utils.Colors.uberCloneColorDark,
                   fontFamily: 'Quicksand',
                   fontSize: 22,
-                  fontWeight: FontWeight.bold
+                  fontWeight: FontWeight.bold,
               ),
             )
           ],
@@ -73,20 +91,22 @@ class HomePage extends StatelessWidget {
     return const Text(
       'SELECCIONA TU ROL',
       style: TextStyle(
-          color: Colors.white,
+          //color: Colors.white,
+          color: utils.Colors.accentColor,
           fontSize: 20,
           fontFamily: 'OneDay'
       ),
     );
   }
 
-  Widget _imageTypeUser(BuildContext context, String image) {
+  Widget _imageTypeUser(BuildContext context, String image, String typeUser) {
     return GestureDetector(
-      onTap: _con.goToLoginPage,
+      onTap: () => _con.goToLoginPage(typeUser),
       child: CircleAvatar(
         backgroundImage: AssetImage(image),
         radius: 50,
-        backgroundColor: Colors.black26,
+        //backgroundColor: Colors.black26,
+        backgroundColor: utils.Colors.uberCloneColorDark,
       ),
     );
   }
@@ -95,11 +115,9 @@ class HomePage extends StatelessWidget {
     return Text(
       typeUser,
       style: const TextStyle(
-          color: Colors.white,
+          color: utils.Colors.accentColor,
           fontSize: 16
       ),
     );
   }
-
-
 }

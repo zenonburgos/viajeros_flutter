@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_custom_clippers/flutter_custom_clippers.dart';
-import 'package:viajeros/src/pages/register/register_controller.dart';
+import 'package:viajeros/src/pages/client/register/client_register_controller.dart';
 import 'package:viajeros/src/utils/colors.dart' as utils;
 import 'package:viajeros/src/widgets/button_app.dart';
 
-class RegisterPage extends StatefulWidget {
-  const RegisterPage({Key? key}) : super(key: key);
+class ClientRegisterPage extends StatefulWidget {
+  const ClientRegisterPage({Key? key}) : super(key: key);
 
   @override
-  State<RegisterPage> createState() => _RegisterPageState();
+  State<ClientRegisterPage> createState() => _ClientRegisterPageState();
 }
 
-class _RegisterPageState extends State<RegisterPage> {
+class _ClientRegisterPageState extends State<ClientRegisterPage> {
 
-  final RegisterController _con = RegisterController();
+  final ClientRegisterController _con = ClientRegisterController();
 
   @override
   void initState() {
@@ -29,6 +29,7 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _con.key,
       appBar: AppBar(),
       body: SingleChildScrollView(
         child: Column(
@@ -53,7 +54,8 @@ class _RegisterPageState extends State<RegisterPage> {
           onPressed: _con.register,
           color: utils.Colors.uberCloneColor,
           text: 'Registrar',
-          textColor: Colors.white,
+          //textColor: Colors.white,
+          textColor: utils.Colors.surfaceColor,
       ),
     );
   }
@@ -131,7 +133,8 @@ class _RegisterPageState extends State<RegisterPage> {
       child: const Text(
         'REGISTRO',
         style: TextStyle(
-            color: Colors.black,
+            //color: Colors.black,
+            color: utils.Colors.uberCloneColorDark,
             fontWeight: FontWeight.bold,
             fontSize: 25
         ),
@@ -150,7 +153,7 @@ class _RegisterPageState extends State<RegisterPage> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             Image.asset(
-              'assets/img/logo_app.png',
+              'assets/img/logo_inver.png',
               width: 150,
               height: 100,
             ),
@@ -159,7 +162,8 @@ class _RegisterPageState extends State<RegisterPage> {
               style: TextStyle(
                   fontFamily: 'Quicksand',
                   fontSize: 22,
-                  color: Colors.white,
+                  //color: Colors.white,
+                  color: utils.Colors.accentColor,
                   fontWeight: FontWeight.bold
               ),
             )

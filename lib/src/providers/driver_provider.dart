@@ -1,17 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:viajeros/src/models/client.dart';
+import 'package:viajeros/src/models/driver.dart';
 
-class ClientProvider {
+class DriverProvider {
 
   CollectionReference? _ref;
 
-  ClientProvider() {
-    _ref = FirebaseFirestore.instance.collection('Clients');
+  DriverProvider() {
+    _ref = FirebaseFirestore.instance.collection('Drivers');
   }
 
-  Future<bool> create(Client client) async {
+  Future<bool> create(Driver driver) async {
     try {
-      await _ref?.doc(client.id).set(client.toJson());
+      await _ref?.doc(driver.id).set(driver.toJson());
       return true;
     } catch(error) {
       String errorMessage = error.toString();
@@ -23,7 +23,7 @@ class ClientProvider {
     return _ref!.doc(id).snapshots(includeMetadataChanges: true);
   }
 
-  Future<Client?> getById(String id) async {
+  Future<Driver?> getById(String id) async {
     DocumentSnapshot<Object?>? document = await _ref?.doc(id).get();
     if (document?.exists ?? false) {
       Map<String, dynamic>? data = document?.data() as Map<String, dynamic>?;
@@ -32,8 +32,9 @@ class ClientProvider {
         String email = data['email'] ?? '';
         String username = data['username'] ?? '';
         String password = data['password'] ?? '';
-        Client client = Client(id: id, email: email, username: username, password: password);
-        return client;
+        String plate = data['plate'] ?? '';
+        Driver driver = Driver(id: id, email: email, username: username, password: password, plate: plate);
+        return driver;
       }
     }
     return null;

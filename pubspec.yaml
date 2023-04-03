@@ -39,6 +39,14 @@ dependencies:
   firebase_auth: ^4.3.0
   firebase_core: ^2.8.0
   cloud_firestore: ^4.4.5
+#  progress_dialog: ^1.2.4 #murió
+  progress_dialog_null_safe: ^1.0.4
+  shared_preferences: ^2.0.20
+  google_maps_flutter: ^2.2.5
+  geolocator: ^9.0.2
+  location: ^4.4.0
+  permission_handler: ^10.2.0
+  geoflutterfire2: ^2.3.15
 
 dev_dependencies:
   flutter_test:
