@@ -1,7 +1,3 @@
-// To parse this JSON data, do
-//
-//     final driver = driverFromJson(jsonString);
-
 import 'dart:convert';
 
 Driver driverFromJson(String str) => Driver.fromJson(json.decode(str));
@@ -15,6 +11,7 @@ class Driver {
     required this.email,
     required this.password,
     required this.plate,
+    this.token = '',
   });
 
   String id;
@@ -22,6 +19,7 @@ class Driver {
   String email;
   String password;
   String plate;
+  String token;
 
   factory Driver.fromJson(Map<String, dynamic> json) => Driver(
     id: json["id"]?.toString() ?? "",
@@ -29,6 +27,7 @@ class Driver {
     email: json["email"] ?? "",
     password: json["password"] ?? "",
     plate: json["plate"] ?? "",
+    token: json["token"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -36,5 +35,6 @@ class Driver {
     "username": username,
     "email": email,
     "plate": plate,
+    "token": token,
   };
 }

@@ -39,4 +39,8 @@ class ClientProvider {
     return null;
   }
 
+  Future<void> update(Map<String, dynamic> data, String id) {
+    return _ref!.doc(id).update(data);
+  }
+
 }

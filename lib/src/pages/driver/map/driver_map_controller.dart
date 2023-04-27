@@ -11,6 +11,7 @@ import 'package:viajeros/src/models/driver.dart';
 import 'package:viajeros/src/providers/auth_provider.dart';
 import 'package:viajeros/src/providers/driver_provider.dart';
 import 'package:viajeros/src/providers/geofire_provider.dart';
+import 'package:viajeros/src/providers/push_notifications_provider.dart';
 import 'package:viajeros/src/utils/my_progress_dialog.dart';
 import 'package:viajeros/src/utils/snackbar.dart' as utils;
 
@@ -36,6 +37,7 @@ class DriverMapController {
   late GeofireProvider _geofireProvider;
   late AuthProvider _authProvider;
   late DriverProvider _driverProvider;
+  late PushNotificationsProvider _pushNotificationsProvider;
 
   late StreamSubscription<DocumentSnapshot> _statusSubscription;
   StreamSubscription<DocumentSnapshot<Object?>>? _driverStreamSubscription;
@@ -51,9 +53,11 @@ class DriverMapController {
     _geofireProvider = GeofireProvider();
     _authProvider = AuthProvider();
     _driverProvider = DriverProvider();
+    _pushNotificationsProvider = PushNotificationsProvider();
     _progressDialog = MyProgressDialog.createProgressDialog(context, 'Conectándose...');
     markerDriver = (await createMarkerImageFromAsset('assets/img/taxi_icon.png'))!;
     checkGPS();
+    saveToken();
     getDriverInfo();
   }
 
@@ -74,7 +78,9 @@ class DriverMapController {
     }
   }
 
-
+  void saveToken() {
+    _pushNotificationsProvider.saveToken(_authProvider.getUser()!.uid, 'driver');
+  }
 
   void openDrawer() {
     key.currentState?.openDrawer();

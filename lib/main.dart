@@ -1,11 +1,14 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:viajeros/src/pages/client/map/client_map_page.dart';
+import 'package:viajeros/src/pages/client/travel_info/client_travel_info_page.dart';
+import 'package:viajeros/src/pages/client/travel_request/client_travel_request_page.dart';
 import 'package:viajeros/src/pages/driver/map/driver_map_page.dart';
 import 'package:viajeros/src/pages/driver/register/driver_register_page.dart';
 import 'package:viajeros/src/pages/home/home_page.dart';
 import 'package:viajeros/src/pages/login/login_page.dart';
 import 'package:viajeros/src/pages/client/register/client_register_page.dart';
+import 'package:viajeros/src/providers/push_notifications_provider.dart';
 import 'package:viajeros/src/utils/colors.dart' as utils;
 
 void main() async {
@@ -23,6 +26,16 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    PushNotificationsProvider? pushNotificationsProvider = PushNotificationsProvider();
+    pushNotificationsProvider.initPushNotifications();
+  }
+
   @override
   Widget build(BuildContext context) {
 
@@ -48,6 +61,8 @@ class _MyAppState extends State<MyApp> {
         'driver/register' : (BuildContext context) => const DriverRegisterPage(),
         'driver/map' : (BuildContext context) => const DriverMapPage(),
         'client/map' : (BuildContext context) => const ClientMapPage(),
+        'client/travel/info' : (BuildContext context) => const ClientTravelInfoPage(),
+        'client/travel/request' : (BuildContext context) => const ClientTravelRequestPage(),
       },
     );
   }

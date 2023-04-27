@@ -7,14 +7,20 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart' as location;
 import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
+import 'package:viajeros/src/environment/api.dart';
 import 'package:viajeros/src/models/client.dart';
 import 'package:viajeros/src/models/driver.dart';
 import 'package:viajeros/src/providers/auth_provider.dart';
 import 'package:viajeros/src/providers/client_provider.dart';
 import 'package:viajeros/src/providers/driver_provider.dart';
 import 'package:viajeros/src/providers/geofire_provider.dart';
+import 'package:viajeros/src/providers/push_notifications_provider.dart';
 import 'package:viajeros/src/utils/my_progress_dialog.dart';
 import 'package:viajeros/src/utils/snackbar.dart' as utils;
+import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:google_maps_webservice/places.dart' as places;
+import 'package:flutter_google_places_hoc081098/flutter_google_places_hoc081098.dart';
 
 class ClientMapController {
   late BuildContext context;
@@ -38,11 +44,22 @@ class ClientMapController {
   late AuthProvider _authProvider;
   late DriverProvider _driverProvider;
   late ClientProvider _clientProvider;
+  late PushNotificationsProvider _pushNotificationsProvider;
 
   late StreamSubscription<DocumentSnapshot> _statusSubscription;
   StreamSubscription<DocumentSnapshot<Object?>>? _clientStreamSubscription;
 
   Client? client;
+
+  String? from;
+  LatLng? fromLatLng;
+
+  String? to;
+  LatLng? toLatLng;
+
+  bool isFromSelected = true;
+
+  final places.GoogleMapsPlaces _places = places.GoogleMapsPlaces(apiKey: Environment.API_KEY_MAPS);
 
   bool isConnect = false;
   ProgressDialog? _progressDialog;
@@ -54,9 +71,11 @@ class ClientMapController {
     _authProvider = AuthProvider();
     _driverProvider = DriverProvider();
     _clientProvider = ClientProvider();
+    _pushNotificationsProvider = PushNotificationsProvider();
     _progressDialog = MyProgressDialog.createProgressDialog(context, 'Conectándose...');
-    markerDriver = (await createMarkerImageFromAsset('assets/img/taxi_icon.png'))!;
+    markerDriver = (await createMarkerImageFromAsset('assets/img/icon_taxi.png'))!;
     checkGPS();
+    saveToken();
     getClientInfo();
   }
 
@@ -76,8 +95,6 @@ class ClientMapController {
       // handle the case when the user is not authenticated
     }
   }
-
-
 
   void openDrawer() {
     key.currentState?.openDrawer();
@@ -101,43 +118,154 @@ class ClientMapController {
   void updateLocation() async {
     try {
       await _determinePosition();
-      _position = await Geolocator.getLastKnownPosition();
+      _position = await Geolocator.getLastKnownPosition(); //Obtener posición una única vez
       centerPosition();
-
-      addMarker(
-          'driver',
-          _position!.latitude,
-          _position!.longitude,
-          'Tu posición',
-          '',
-          markerDriver
-      );
-      refresh();
-
-      const LocationSettings locationSettings = LocationSettings(
-          accuracy: LocationAccuracy.best,
-          distanceFilter: 1
-      );
-
-      _positionStream = Geolocator.getPositionStream(
-          locationSettings: locationSettings).listen((Position position) {
-        _position = position;
-        addMarker(
-            'driver',
-            _position!.latitude,
-            _position!.longitude,
-            'Tu posición',
-            '',
-            markerDriver
-        );
-        animateCameraToPosition(position.latitude, position.longitude);
-        refresh();
-      });
+      getNearbyDrivers();
 
     } catch(error) {
       print('Error en la localización: $error');
     }
   }
+
+  void requestDriver() {
+    if (fromLatLng != null && toLatLng != null){
+      Navigator.pushNamed(context, 'client/travel/info', arguments: {
+        'from': from,
+        'to': to,
+        'fromLatLng': fromLatLng,
+        'toLatLng': toLatLng
+      });
+    }
+    else{
+      utils.Snackbar.showSnackbar(context, key, 'Seleccionar el lugar de recogida y destino.');
+    }
+  }
+
+  void changeFromTO() {
+    isFromSelected = !isFromSelected;
+
+    if (isFromSelected) {
+      utils.Snackbar.showSnackbar(context, key, 'Estás seleccionando el lugar de recogida');
+    }
+    else {
+      utils.Snackbar.showSnackbar(context, key, 'Estás seleccionando el destino');
+    }
+  }
+
+  Future<Null> showGoogleAutoComplete(bool isFrom) async {
+    places.Prediction? p = await PlacesAutocomplete.show(
+      context: context,
+      apiKey: Environment.API_KEY_MAPS,
+      language: 'es',
+      strictbounds: true,
+      radius: 5000,
+      location: places.Location(lat: 13.9770825, lng: -89.7546227),
+    );
+
+    if(p != null) {
+      places.PlacesDetailsResponse detail =
+      await _places.getDetailsByPlaceId(p.placeId!, language: 'es');
+      double lat = detail.result.geometry!.location.lat;
+      double lng = detail.result.geometry!.location.lng;
+      List<Placemark> placemarks = await placemarkFromCoordinates(lat, lng);
+      if (placemarks.isNotEmpty) {
+        Placemark placemark = placemarks[0];
+        String? direction = placemark.thoroughfare;
+        String? city = placemark.locality;
+        String? department = placemark.administrativeArea;
+
+        if(isFrom) {
+          from = '$direction, $city, $department';
+          fromLatLng = LatLng(lat, lng);
+        }
+        else{
+          to = '$direction, $city, $department';
+          toLatLng = LatLng(lat, lng);
+        }
+        refresh();
+      }
+    }
+  }
+
+  Future<Null> setLocationDraggableInfo() async {
+    if (initialPosition != null) {
+      double lat = initialPosition.target.latitude;
+      double lng = initialPosition.target.longitude;
+
+      List<Placemark> address = await placemarkFromCoordinates(lat, lng);
+
+      if (address.isNotEmpty) {
+        String? direction = address[0].thoroughfare;
+        String? street = address[0].subThoroughfare;
+        String? city = address[0].locality;
+        String? department = address[0].administrativeArea;
+        String? country = address[0].country;
+
+        if (isFromSelected) {
+          from = '$direction, $street, $city, $department';
+          fromLatLng = LatLng(lat, lng);
+        }
+        else {
+          to = '$direction #$street, $city, $department';
+          toLatLng = LatLng(lat, lng);
+        }
+
+        refresh();
+      }
+    }
+  }
+
+  void saveToken() {
+    _pushNotificationsProvider.saveToken(_authProvider.getUser()!.uid, 'client');
+  }
+
+  void getNearbyDrivers() {
+    Stream<List<DocumentSnapshot>> stream =
+    _geofireProvider.getNearbyDrivers(_position!.latitude, _position!.longitude, 50);
+
+    stream.listen((List<DocumentSnapshot> documentList) {
+
+      for (DocumentSnapshot d in documentList) {
+        print('DOCUMENT: $d');
+      }
+
+      for (MarkerId m in markers.keys) {
+        bool remove = true;
+
+        for (DocumentSnapshot d in documentList) {
+          if (m.value == d.id) {
+            remove = false;
+          }
+        }
+
+        if (remove) {
+          markers.remove(m);
+          refresh();
+        }
+
+      }
+
+      for (var d in documentList) {
+        var point = (d.data() as Map<String, dynamic>?)?['position']?['geopoint'] as GeoPoint?;
+        if (point != null) {
+          addMarker(
+            d.id,
+            point.latitude,
+            point.longitude,
+            'Conductor disponible',
+            d.id,
+            markerDriver,
+          );
+        }
+      }
+
+
+
+      refresh();
+
+    });
+  }
+
 
   void centerPosition() {
     if (_position != null) {

@@ -44,20 +44,29 @@ class _ClientMapPageState extends State<ClientMapPage> {
             SafeArea(
               child: Column(
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      _buttonDrawer(),
-                      _buttonCenterPosition()
-                    ],
-                  ),
+                  _buttonDrawer(),
+                  _cardGooglePlaces(),
+                  _buttonChangeTo(),
+                  _buttonCenterPosition(),
                   Expanded(child: Container()),
                   _buttonRequest()
                 ],
               ),
+            ),
+            Align(
+              alignment: Alignment.center,
+              child: _iconMyLocation(),
             )
           ],
         )
+    );
+  }
+
+  Widget _iconMyLocation() {
+    return Image.asset(
+        'assets/img/my_location.png',
+      width: 65,
+      height: 65,
     );
   }
 
@@ -126,7 +135,7 @@ class _ClientMapPageState extends State<ClientMapPage> {
       onTap: _con.centerPosition,
       child: Container(
         alignment: Alignment.centerRight,
-        margin: EdgeInsets.symmetric(horizontal: 5),
+        margin: const EdgeInsets.symmetric(horizontal: 18),
         child: Card(
           shape: const CircleBorder(),
           color: Colors.white,
@@ -136,6 +145,28 @@ class _ClientMapPageState extends State<ClientMapPage> {
             child: const Icon(
                 Icons.location_searching,
                 color: Colors.black26,
+                size: 20
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buttonChangeTo() {
+    return GestureDetector(
+      onTap: _con.changeFromTO,
+      child: Container(
+        alignment: Alignment.centerRight,
+        margin: EdgeInsets.symmetric(horizontal: 18),
+        child: Card(
+          shape: CircleBorder(),
+          color: Colors.white,
+          elevation: 4.0,
+          child: Container(
+            padding: EdgeInsets.all(10),
+            child: Icon(
+                Icons.sync, color: Colors.grey[600],
                 size: 20
             ),
           ),
@@ -160,7 +191,9 @@ class _ClientMapPageState extends State<ClientMapPage> {
       alignment: Alignment.bottomCenter,
       margin: const EdgeInsets.symmetric(horizontal: 60, vertical: 30),
       child: ButtonApp(
-        onPressed: () {},
+        onPressed: () {
+          _con.requestDriver();
+        },
         text: 'SOLICITAR VEHÍCULO',
         color: utils.Colors.accentColor,
         textColor: Colors.black,
@@ -176,6 +209,79 @@ class _ClientMapPageState extends State<ClientMapPage> {
       myLocationEnabled: false,
       myLocationButtonEnabled: false,
       markers: Set<Marker>.of(_con.markers.values),
+      onCameraMove: (position) {
+        _con.initialPosition = position;
+      },
+      onCameraIdle: () async {
+        await _con.setLocationDraggableInfo();
+      },
+    );
+  }
+
+  Widget _cardGooglePlaces() {
+    return Container(
+      width: MediaQuery.of(context).size.width * 0.9,
+      child: Card(
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20)
+        ),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _infoCardLocation(
+                  'Desde',
+                  _con.from ?? 'Lugar de recogida',
+                      () async {
+                    await _con.showGoogleAutoComplete(true);
+                  }
+              ),
+              const SizedBox(height: 5),
+              Container(
+                  width: double.infinity,
+                  child: Divider(color: Colors.grey, height: 10,)
+              ),
+              const SizedBox(height: 5),
+              _infoCardLocation(
+                  'Hasta',
+                  _con.to ?? 'Lugar de destino',
+                      () async {
+                    await _con.showGoogleAutoComplete(false);
+                  }
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _infoCardLocation(String title, String value, VoidCallback function) {
+    return GestureDetector(
+      onTap: function,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+                color: Colors.grey,
+                fontSize: 10
+            ),
+            textAlign: TextAlign.start,
+          ),
+          Text(
+            value,
+            style: const TextStyle(
+              color: Colors.black,
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+            ),
+            maxLines: 2,
+          ),
+        ],
+      ),
     );
   }
 

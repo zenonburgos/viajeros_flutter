@@ -24,20 +24,21 @@ class DriverProvider {
   }
 
   Future<Driver?> getById(String id) async {
-    DocumentSnapshot<Object?>? document = await _ref?.doc(id).get();
-    if (document?.exists ?? false) {
-      Map<String, dynamic>? data = document?.data() as Map<String, dynamic>?;
-      if (data != null) {
-        String id = data['id'] ?? '';
-        String email = data['email'] ?? '';
-        String username = data['username'] ?? '';
-        String password = data['password'] ?? '';
-        String plate = data['plate'] ?? '';
-        Driver driver = Driver(id: id, email: email, username: username, password: password, plate: plate);
-        return driver;
-      }
+    DocumentSnapshot document = await _ref!.doc(id).get();
+
+    if(document.exists) {
+      Map<String, dynamic> data = document.data() as Map<String, dynamic>;
+
+      Driver driver = Driver.fromJson(data);
+      //print('Token del conductor: $driver.token');
+      return driver;
     }
+
     return null;
+  }
+
+  Future<void> update(Map<String, dynamic> data, String id) {
+    return _ref!.doc(id).update(data);
   }
 
 }
